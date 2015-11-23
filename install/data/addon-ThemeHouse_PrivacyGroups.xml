@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<addon addon_id="ThemeHouse_PrivacyGroups" title="[⌂] Privacy Groups" version_string="1.0.3a" version_id="1447261019" url="http://xf.themehouse.io/" install_callback_class="ThemeHouse_Install" install_callback_method="install" uninstall_callback_class="ThemeHouse_Install" uninstall_callback_method="uninstall">
+  <admin_navigation>
+    <navigation navigation_id="thPrivacyGroups" parent_navigation_id="usersSection" display_order="200" link="privacy-groups" admin_permission_id="privacyGroup" debug_only="0" hide_no_children="0"/>
+  </admin_navigation>
+  <admin_permissions>
+    <admin_permission admin_permission_id="privacyGroup" display_order="3000"/>
+  </admin_permissions>
+  <admin_style_properties/>
+  <admin_templates>
+    <template title="th_privacy_group_delete_privacygroups"><![CDATA[<xen:title>{xen:phrase th_confirm_deletion_of_privacy_group_privacygroups}: {$privacyGroup.title}</xen:title>
+<xen:h1>{xen:phrase th_confirm_deletion_of_privacy_group_privacygroups}</xen:h1>
+
+<xen:navigation>
+	<xen:breadcrumb href="{xen:adminlink 'privacy-groups/edit', $privacy_group}">{$privacyGroup.title}</xen:breadcrumb>
+</xen:navigation>
+
+<xen:require css="delete_confirmation.css" />
+
+<xen:form action="{xen:adminlink 'privacy-groups/delete', $privacy_group}" class="deleteConfirmForm">
+	<p>{xen:phrase th_please_confirm_delete_following_privacy_group_privacygroups}:</p>
+	<strong><a href="{xen:adminlink 'privacy-groups/edit', $privacy_group}">{$privacyGroup.title}</a></strong>
+	
+	<xen:submitunit save="{xen:phrase th_delete_privacy_group_privacygroups}" />
+
+	<input type="hidden" name="_xfConfirm" value="1" />
+</xen:form>]]></template>
+    <template title="th_privacy_group_edit_privacygroups"><![CDATA[<xen:title>{xen:if {$privacyGroup.privacy_group_id}, '{xen:phrase th_edit_privacy_group_privacygroups}: {$privacyGroup.title}', '{xen:phrase th_create_new_privacy_group_privacygroups}'}</xen:title>
+
+<xen:if is="{$privacyGroup.privacy_group_id}">
+	<xen:navigation>
+		<xen:breadcrumb href="{xen:adminlink privacy-groups}#{xen:helper listitemid, $privacyGroup.privacy_group_id}">{$privacyGroup.title}</xen:breadcrumb>
+	</xen:navigation>
+</xen:if>
+
+<xen:form action="{xen:adminlink 'privacy-groups/save', $privacyGroup}">
+
+	<ul class="tabs Tabs" data-panes="#privacyGroupPanes > li">
+		<li class="active"><a>{xen:phrase th_privacy_group_options_privacygroups}</a></li>
+		<li><a>{xen:phrase th_apply_this_privacy_group_while_privacygroups}</a></li>
+		<li><a>{xen:phrase custom_userfield_criteria}</a></li>
+	</ul>
+	
+	<ul id="privacyGroupPanes">
+		<li>
+			<xen:textboxunit label="{xen:phrase title}:" name="title" value="{$privacyGroup.title}" data-liveTitleTemplate="{xen:if {$privacyGroup.privacy_group_id},
+				'{xen:phrase th_edit_privacy_group_privacygroups}: <em>%s</em>',
+				'{xen:phrase th_create_new_privacy_group_privacygroups}: <em>%s</em>'}" />
+				
+			<xen:checkboxunit label="">
+				<xen:option name="active" selected="{$privacyGroup.active}">{xen:phrase th_privacy_group_is_active_privacygroups}</xen:option>
+			</xen:checkboxunit>
+	
+			<fieldset>
+				<xen:checkboxunit label="{xen:phrase th_privacy_group_selectable_for_options_privacygroups}:" name="privacy_options">
+					<xen:options source="$privacyOptions" />
+				</xen:checkboxunit>
+			</fieldset>
+		</li>
+		<li>
+			<xen:include template="helper_criteria_user">
+				<xen:set var="$criteriaHintHtml">{xen:phrase th_user_must_meet_all_criteria_to_be_given_permission_privacygroups}</xen:set>
+			</xen:include>
+			<xen:include template="helper_criteria_user_date">
+				<xen:set var="$noDateFields">1</xen:set>
+			</xen:include>
+		</li>
+		<li><xen:include template="helper_criteria_user_field" /></li>
+	</ul>
+	
+	<xen:submitunit save="{xen:phrase th_save_privacy_group_privacygroups}">
+		<xen:if is="{$privacyGroup.privacy_group_id}">
+			<input type="button" value="{xen:phrase th_delete_privacy_group_privacygroups}..." accesskey="d" class="button OverlayTrigger"
+				data-href="{xen:adminlink 'privacy-groups/delete', $privacyGroup}" /></xen:if>
+	</xen:submitunit>
+</xen:form>]]></template>
+    <template title="th_privacy_group_list_privacygroups"><![CDATA[<xen:title>{xen:phrase th_privacy_groups_privacygroups}</xen:title>
+
+<xen:topctrl>
+	<a href="{xen:adminlink privacy-groups/add}" class="button">+ {xen:phrase th_create_new_privacy_group_privacygroups}</a>
+</xen:topctrl>
+
+<xen:require css="filter_list.css" />
+<xen:require js="js/xenforo/filter_list.js" />
+
+<xen:form action="{xen:adminlink privacy-groups/toggle}" class="section AutoValidator">
+	<xen:if is="{$privacyGroups}">
+		<h2 class="subHeading">
+			<xen:include template="filter_list_controls" />
+			{xen:phrase th_privacy_groups_privacygroups}
+		</h2>
+	
+		<ol class="FilterList">
+		<xen:foreach loop="$privacyGroups" value="$privacy_group">
+			<xen:listitem
+				id="{$privacy_group.privacy_group_id}"
+				label="{$privacy_group.title}"
+				href="{xen:adminlink privacy-groups/edit, $privacy_group}"
+				delete="{xen:adminlink privacy-groups/delete, $privacy_group}"
+				toggle="{$privacy_group.active}"
+				toggletitle="{xen:phrase enable_disable_x, 'title={$privacy_group.title}'}" />
+		</xen:foreach>
+		</ol>
+	
+		<p class="sectionFooter">{xen:phrase showing_x_of_y_items, 'count=<span class="FilterListCount">{xen:count $privacyGroups}</span>', 'total={xen:count $privacyGroups}'}</p>
+	<xen:else />
+		<div class="noResults">{xen:phrase th_no_privacy_groups_have_been_defined_privacygroups}</div>
+	</xen:if>
+</xen:form>]]></template>
+    <template title="th_privacy_option_privacygroups"><![CDATA[<xen:foreach loop="{$privacyGroups}" key="{$privacyGroupId}" value="{$privacyGroup}">
+	<xen:if is="in_array({$privacyOption}, {$privacyGroup.privacy_options})">
+		<option value="{$privacyGroupId}"{xen:selected '{$privacyOptionValue} == {$privacyGroupId}'}>{$privacyGroup.title}</option>
+	</xen:if>
+</xen:foreach>]]></template>
+  </admin_templates>
+  <admin_template_modifications/>
+  <code_events/>
+  <code_event_listeners>
+    <listener event_id="controller_pre_dispatch" execute_order="10" callback_class="ThemeHouse_Listener_ControllerPreDispatch" callback_method="controllerPreDispatch" active="1" hint="" description=""/>
+    <listener event_id="file_health_check" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_FileHealthCheck" callback_method="fileHealthCheck" active="1" hint="" description=""/>
+    <listener event_id="init_dependencies" execute_order="10" callback_class="ThemeHouse_Listener_InitDependencies" callback_method="initDependencies" active="1" hint="" description=""/>
+    <listener event_id="load_class" execute_order="5" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassController" active="0" hint="XenForo_ControllerPublic_Account" description="XenForo_ControllerPublic_Account (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassModel" active="0" hint="XenForo_Model_Conversation" description="XenForo_Model_Conversation (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassModel" active="0" hint="XenForo_Model_User" description="XenForo_Model_User (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassModel" active="0" hint="XenForo_Model_UserProfile" description="XenForo_Model_UserProfile (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassDataWriter" active="0" hint="XenForo_DataWriter_User" description="XenForo_DataWriter_User (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassModel" active="0" hint="sonnb_XenGallery_Model_Album" description="sonnb_XenGallery_Model_Album (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassModel" active="0" hint="sonnb_XenGallery_Model_Photo" description="sonnb_XenGallery_Model_Photo (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassModel" active="0" hint="sonnb_XenGallery_Model_Tag" description="sonnb_XenGallery_Model_Tag (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassModel" active="0" hint="XfAddOns_Blogs_Model_Blog" description="XfAddOns_Blogs_Model_Blog (For XenForo 1.2 and above)" compatibility_switch="1"/>
+    <listener event_id="load_class_controller" execute_order="5" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassController" active="1" hint="" description="(For XenForo 1.1 and below)" compatibility_switch="1"/>
+    <listener event_id="load_class_datawriter" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassDataWriter" active="1" hint="" description="(For XenForo 1.1 and below)" compatibility_switch="1"/>
+    <listener event_id="load_class_model" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_LoadClass" callback_method="loadClassModel" active="1" hint="" description="(For XenForo 1.1 and below)" compatibility_switch="1"/>
+    <listener event_id="template_post_render" execute_order="10" callback_class="ThemeHouse_PrivacyGroups_Listener_TemplatePostRender" callback_method="templatePostRender" active="1" hint="" description=""/>
+  </code_event_listeners>
+  <cron/>
+  <email_templates/>
+  <email_template_modifications/>
+  <optiongroups/>
+  <permissions>
+    <permission_groups/>
+    <permissions/>
+    <interface_groups/>
+  </permissions>
+  <phrases>
+    <phrase title="admin_navigation_thPrivacyGroups" version_id="0" version_string="1.0.0"><![CDATA[Privacy Groups]]></phrase>
+    <phrase title="admin_permission_privacyGroup" version_id="0" version_string="1.0.0"><![CDATA[Manage privacy groups]]></phrase>
+    <phrase title="th_apply_this_privacy_group_while_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Apply This Privacy Group While...]]></phrase>
+    <phrase title="th_confirm_deletion_of_privacy_group_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Confirm Deletion of Privacy Group]]></phrase>
+    <phrase title="th_create_new_privacy_group_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Create New Privacy Group]]></phrase>
+    <phrase title="th_delete_privacy_group_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Delete Privacy Group]]></phrase>
+    <phrase title="th_edit_privacy_group_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Edit Privacy Group]]></phrase>
+    <phrase title="th_no_privacy_groups_have_been_defined_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[No privacy groups have been defined.]]></phrase>
+    <phrase title="th_please_confirm_delete_following_privacy_group_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Please confirm that you want to delete the following privacy group]]></phrase>
+    <phrase title="th_please_select_at_least_one_privacy_option_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Please select at least one privacy option.]]></phrase>
+    <phrase title="th_privacy_groups_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Privacy Groups]]></phrase>
+    <phrase title="th_privacy_group_is_active_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Privacy group is active]]></phrase>
+    <phrase title="th_privacy_group_options_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Privacy Group Options]]></phrase>
+    <phrase title="th_privacy_group_selectable_for_options_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Privacy Group Selectable for Options]]></phrase>
+    <phrase title="th_requested_privacy_group_not_found_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[The requested privacy group could not be found.]]></phrase>
+    <phrase title="th_save_privacy_group_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[Save Privacy Group]]></phrase>
+    <phrase title="th_user_must_meet_all_criteria_to_be_given_permission_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[A user must meet all criteria to be given privacy permission.]]></phrase>
+  </phrases>
+  <route_prefixes>
+    <route_type type="admin">
+      <prefix original_prefix="privacy-groups" class="ThemeHouse_PrivacyGroups_Route_PrefixAdmin_PrivacyGroups" build_link="data_only"/>
+    </route_type>
+  </route_prefixes>
+  <style_properties/>
+  <templates>
+    <template title="th_privacy_option_privacygroups" version_id="0" version_string="1.0.0"><![CDATA[<xen:foreach loop="{$privacyGroups}" key="{$privacyGroupId}" value="{$privacyGroup}">
+	<xen:if is="in_array({$privacyOption}, {$privacyGroup.privacy_options})">
+		<xen:set var="$privacyOptionGroup">{$privacyOption}_group</xen:set>
+		<option value="{$privacyGroupId}"{xen:selected '{$visitor.{$privacyOptionGroup}} == {$privacyGroupId}'}>{$privacyGroup.title}</option>
+	</xen:if>
+</xen:foreach>]]></template>
+    <template title="th_xengallery_privacy_option_privacygroups" version_id="1376949231" version_string="1.0.2"><![CDATA[<xen:foreach loop="{$privacyGroups}" key="{$privacyGroupId}" value="{$privacyGroup}">
+	<xen:if is="in_array({$privacyOption}, {$privacyGroup.privacy_options})">
+		<option value="{$privacyGroupId}"{xen:selected '{$visitor.xengallery.{$privacyOption}} == {$privacyGroupId}'}>{$privacyGroup.title}</option>
+	</xen:if>
+</xen:foreach>]]></template>
+  </templates>
+  <public_template_modifications>
+    <modification template="footer" modification_key="th_copyrightNotice_privacyGroups" description="Copyright notice for [⌂] Privacy Groups" execution_order="1" enabled="1" action="callback">
+      <find><![CDATA[/{xen:phrase (?:xenforo|extra)_copyright}/]]></find>
+      <replace><![CDATA[ThemeHouse_Listener_InitDependencies::copyrightNotice]]></replace>
+    </modification>
+  </public_template_modifications>
+  <bb_code_media_sites/>
+  <bb_codes/>
+</addon>
